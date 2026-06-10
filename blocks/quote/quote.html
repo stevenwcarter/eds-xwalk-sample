@@ -1,0 +1,7 @@
+<div class="quote" {{ aue_block() }}>
+  <blockquote {{ aue("quote") }}>{{ fields.quote | safe }}</blockquote>
+  <div class="quote-attribution">
+    <p class="quote-author" {{ aue("name") }}>{{ fields.name }}</p>
+    <p class="quote-title" {{ aue("title") }}>{{ fields.title }}</p>
+  </div>
+</div>

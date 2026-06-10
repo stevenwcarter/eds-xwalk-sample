@@ -1,0 +1,37 @@
+.fieldsdemo {
+  max-width: 52rem;
+  margin: 2rem auto;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #b9c3da;
+  border-radius: 6px;
+  font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.fieldsdemo .fieldsdemo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #e3e8f2;
+}
+
+.fieldsdemo .fieldsdemo-row:last-child {
+  border-bottom: 0;
+}
+
+.fieldsdemo .fieldsdemo-label {
+  font-weight: 700;
+  color: #2f5bea;
+}
+
+/* Keep the value cell inline next to its label, and tame embedded media. */
+.fieldsdemo .fieldsdemo-row > div {
+  margin: 0;
+}
+
+.fieldsdemo .fieldsdemo-row img {
+  max-height: 4rem;
+  width: auto;
+}

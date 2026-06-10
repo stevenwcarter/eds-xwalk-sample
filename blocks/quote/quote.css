@@ -1,0 +1,54 @@
+.quote {
+  position: relative;
+  max-width: 52rem;
+  margin: 3rem auto;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid #b9c3da;
+  border-bottom: 1px solid #b9c3da;
+}
+
+/* The big quotation mark sits on the top rule, masking it with a white gap. */
+.quote::before {
+  content: "\201C";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  padding: 0 0.75rem;
+  background: var(--background-color, #fff);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  font-size: 3.25rem;
+  line-height: 1;
+  color: #2f5bea;
+}
+
+.quote blockquote {
+  margin: 0 auto;
+  max-width: 40rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #3a3a3a;
+}
+
+.quote blockquote p {
+  margin: 0;
+}
+
+.quote-attribution {
+  margin-top: 1.75rem;
+}
+
+.quote-author,
+.quote-title {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: #2f5bea;
+}
