@@ -1,0 +1,69 @@
+.signups-stats {
+  max-width: 32rem;
+  margin: 2.5rem auto;
+  padding: 1.75rem 2rem;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #2a2a2a;
+  background: #f5f7fc;
+  border: 1px solid #e3e8f2;
+  border-radius: 0.75rem;
+}
+
+.signups-stats-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.signups-stats-number {
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #2f5bea;
+}
+
+.signups-stats-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6a7488;
+}
+
+.signups-stats-latest {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #2a2a2a;
+}
+
+.signups-stats-per-day {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #e3e8f2;
+}
+
+.signups-stats-per-day li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid #e3e8f2;
+  font-size: 0.9rem;
+}
+
+.signups-stats-day {
+  color: #2a2a2a;
+}
+
+.signups-stats-count {
+  font-weight: 700;
+  color: #2f5bea;
+}
+
+.signups-stats-empty {
+  text-align: center;
+  font-style: italic;
+  color: #6a7488;
+}

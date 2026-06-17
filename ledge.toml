@@ -1,0 +1,9 @@
+[plugins]
+enabled = true
+dir = "plugins"
+
+[forms]
+dir = "forms"
+
+[site]
+origin = "http://localhost:3000"

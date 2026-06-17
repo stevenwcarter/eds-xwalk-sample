@@ -1,0 +1,18 @@
+{
+  "path": "/signups",
+  "metadata": {
+    "title": "Event Signups",
+    "description": "Sign up and see who's coming."
+  },
+  "sections": [
+    {
+      "style": [],
+      "nodes": [
+        { "type": "default", "html": "<h1>Event Signups</h1><p>Add your name below to join us, then see who else is coming.</p>" },
+        { "type": "block", "name": "form", "model": "form", "classes": [], "fields": { "form": "signups" } },
+        { "type": "block", "name": "signups-table", "model": "signups-table", "classes": [], "fields": { "source": "/data/signups" } },
+        { "type": "block", "name": "signups-stats", "model": "signups-stats", "classes": [], "fields": { "source": "/data/signups" } }
+      ]
+    }
+  ]
+}

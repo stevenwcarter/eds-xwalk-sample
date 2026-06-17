@@ -12,3 +12,9 @@ helix-importer-ui
 !CLAUDE.md
 !AGENTS.md
 /stores
+# but track hand-authored preview content (source of truth); published is generated
+!/stores/
+!/stores/preview/
+!/stores/preview/content/
+!/stores/preview/content/**
+/stores/published

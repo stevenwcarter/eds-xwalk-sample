@@ -1,0 +1,44 @@
+.signups-table {
+  max-width: 60rem;
+  margin: 2.5rem auto;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.signups-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #2a2a2a;
+}
+
+.signups-table thead th {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #2f5bea;
+  border-bottom: 2px solid #b9c3da;
+}
+
+.signups-table tbody td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid #e3e8f2;
+}
+
+.signups-table tbody tr:nth-child(even) {
+  background: #f5f7fc;
+}
+
+.signups-table tbody tr:hover {
+  background: #eef2fb;
+}
+
+.signups-table-empty {
+  margin: 2.5rem auto;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: italic;
+  color: #6a7488;
+}
