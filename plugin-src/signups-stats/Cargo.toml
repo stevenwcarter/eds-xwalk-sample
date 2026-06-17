@@ -1,0 +1,15 @@
+[package]
+name = "signups-stats"
+edition = "2024"
+version = "0.1.0"
+publish = false
+description = "Demo ledge plugin: a signups-stats renderer that reads the /data/signups sheet via the read-sheet host capability and renders live aggregate stats (no KV memoization, so it always reflects the latest signups)."
+
+[lib]
+# A wasm component is built from a cdylib core module (`wasm-tools component new`).
+crate-type = ["cdylib"]
+
+[dependencies]
+ledge-plugin-sdk = { path = "../../../ledge-cms/crates/ledge-plugin-sdk" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

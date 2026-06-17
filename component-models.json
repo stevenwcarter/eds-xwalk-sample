@@ -422,5 +422,17 @@
         "label": "Sheet source"
       }
     ]
+  },
+  {
+    "id": "signups-stats",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "source",
+        "value": "/data/signups",
+        "label": "Sheet source"
+      }
+    ]
   }
 ]
