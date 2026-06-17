@@ -1,0 +1,11 @@
+{
+  "tabs": [
+    {
+      "name": "signups",
+      "columns": ["submitted_at", "name", "email", "message"],
+      "rows": [
+        ["2026-06-16T09:00:00Z", "Ada Lovelace", "ada@example.com", "Excited to attend!"]
+      ]
+    }
+  ]
+}
