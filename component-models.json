@@ -410,5 +410,17 @@
         "options": []
       }
     ]
+  },
+  {
+    "id": "signups-table",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "source",
+        "value": "/data/signups",
+        "label": "Sheet source"
+      }
+    ]
   }
 ]

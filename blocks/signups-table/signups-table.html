@@ -1,0 +1,15 @@
+<div class="signups-table" {{ aue_block() }}>
+  {% set s = sheet(fields.source) %}
+  {% if s.rows %}
+  <table>
+    <thead><tr>{% for c in s.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in s.rows %}
+      <tr>{% for c in s.columns %}<td>{{ row[c] }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="signups-table-empty">No signups yet.</p>
+  {% endif %}
+</div>
