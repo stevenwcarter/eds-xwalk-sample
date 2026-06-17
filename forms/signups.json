@@ -1,0 +1,9 @@
+{
+  "data": [
+    { "Name": ":sheet", "Value": "/data/signups" },
+    { "Name": ":tab", "Value": "signups" },
+    { "Name": "name", "Type": "text", "Label": "Your name", "Mandatory": "true" },
+    { "Name": "email", "Type": "email", "Label": "Email", "Mandatory": "true" },
+    { "Name": "message", "Type": "textarea", "Label": "Message", "Placeholder": "Optional note" }
+  ]
+}

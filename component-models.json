@@ -398,5 +398,17 @@
         ]
       }
     ]
+  },
+  {
+    "id": "form",
+    "fields": [
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "form",
+        "label": "Form",
+        "options": []
+      }
+    ]
   }
 ]
