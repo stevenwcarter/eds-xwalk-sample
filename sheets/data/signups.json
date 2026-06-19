@@ -7,5 +7,6 @@
         ["2026-06-16T09:00:00Z", "Ada Lovelace", "ada@example.com", "Excited to attend!"]
       ]
     }
-  ]
+  ],
+  "collects_submissions": true
 }

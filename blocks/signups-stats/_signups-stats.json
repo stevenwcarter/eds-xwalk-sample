@@ -21,7 +21,7 @@
       "id": "signups-stats",
       "fields": [
         {
-          "component": "text",
+          "component": "sheet",
           "valueType": "string",
           "name": "source",
           "value": "/data/signups",

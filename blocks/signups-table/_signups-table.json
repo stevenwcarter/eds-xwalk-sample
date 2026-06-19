@@ -21,7 +21,7 @@
       "id": "signups-table",
       "fields": [
         {
-          "component": "text",
+          "component": "sheet",
           "valueType": "string",
           "name": "source",
           "value": "/data/signups",

@@ -52,7 +52,10 @@
         "columns",
         "fragment",
         "quote",
-        "fieldsdemo"
+        "fieldsdemo",
+        "form",
+        "signups-stats",
+        "signups-table"
       ]
     }
   ]
