@@ -43,7 +43,7 @@
 .form select:focus {
   outline: none;
   border-color: #1473e6;
-  box-shadow: 0 0 0 2px rgba(20, 115, 230, 0.2);
+  box-shadow: 0 0 0 2px rgb(20 115 230 / 20%);
 }
 
 .form button[type="submit"] {

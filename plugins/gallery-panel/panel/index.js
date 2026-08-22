@@ -33,12 +33,14 @@
 // panel may `import('./jco-component/index.js')` and call its `render()` to
 // show a live preview using the very same Rust renderer that runs on the
 // server. See `crates/ledge-plugin-sdk/examples/README.md`.
-import { definePanel } from "/plugins/_sdk/panel-runtime.js";
+import { definePanel } from '/plugins/_sdk/panel-runtime.js';
 
 export const { mount, unmount } = definePanel({
   fields: [
-    { name: "image", type: "media", label: "Image" },
-    { name: "caption", type: "text", label: "Caption" },
-    { name: "layout", type: "select", label: "Layout", options: ["grid", "row"] },
+    { name: 'image', type: 'media', label: 'Image' },
+    { name: 'caption', type: 'text', label: 'Caption' },
+    {
+      name: 'layout', type: 'select', label: 'Layout', options: ['grid', 'row'],
+    },
   ],
 });

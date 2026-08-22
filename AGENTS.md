@@ -23,6 +23,11 @@ The repository provides the basic structure, blocks, and configuration needed to
   - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
+- A Husky **pre-commit hook** (`.husky/pre-commit.mjs`) runs automatically on every commit. It
+  regenerates the aggregated `component-*.json` files when a model partial is staged, applies
+  `eslint --fix` and `stylelint --fix`, re-stages **only** the staged files it actually changed,
+  and then runs the same `npm run lint` that CI runs. A failure that auto-fix cannot resolve
+  aborts the commit. Run `npm install` once to install the hook (`prepare` script).
 
 ## Project Structure
 
