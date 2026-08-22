@@ -1,16 +1,27 @@
-//! Demo ledge plugin: a **live** `signups-stats` renderer.
+//! Demo ledge plugin: a **live, memoized** `signups-stats` renderer.
 //!
-//! This is the counterpoint to the `data-table` example. It reads the author
-//! **sheet data source** at `source` (default `/data/signups`) via the
-//! `read-sheet` host capability and renders aggregate stats over the signup
-//! rows: the total count, the latest entry, and per-day counts.
+//! This is the counterpoint to the SDK's `data-table` example, ported onto the
+//! same [`Block`] + typed-[`Sheet`] + [`cache::memoize`] surface. It reads the
+//! author **sheet data source** at `source` (default `/data/signups`) via
+//! `host::read_sheet` and renders aggregate stats over the signup rows: the
+//! total count, the latest entry, and per-day counts.
 //!
-//! Unlike `data-table`, this renderer **does NOT memoize** its HTML in the
-//! plugin KV cache. Per-plugin KV is busted only on a *code* change, never on a
-//! *sheet-data* change, so a memoizing stats block would serve stale numbers
-//! after a new signup. Computing stats over a signups sheet is cheap, so it runs
-//! fresh on every render; correct published-cache invalidation is handled by the
-//! engine's sheet read-dependency, not by the plugin.
+//! **Memoization is on.** A plugin's private KV cache is cleared only on a
+//! *code* change, never a *data* change — a naive `cache_get`/`cache_put` keyed
+//! on just the page path would keep serving the count from before the newest
+//! signup forever. [`cache::memoize`] closes that gap by folding the sheet's
+//! `host::source_version` into the cache key: a submission bumps the sheet's
+//! version, which changes the key, which misses the cache and recomputes. The
+//! empty state (an absent or empty sheet) is memoized too — it is correct until
+//! the sheet appears or gains rows, and an absent source versions as `0`, so
+//! creating the sheet changes the key just like editing it does.
+//!
+//! An earlier version of this plugin hand-wrote its own `single_fields` /
+//! `scalar` / `html_escape` / `Sheet` decoding and ran **uncached** specifically
+//! to dodge that stale-count bug (a path-only KV key can't tell a stale sheet
+//! from a fresh one). None of that workaround remains: the typed host + a
+//! version-keyed cache key make correct memoization the easy path instead of a
+//! trap.
 //!
 //! The output is deterministic (it derives only from the sheet rows, no time or
 //! randomness) and carries zero `data-aue-*` attributes — the host wraps the
@@ -19,17 +30,13 @@
 //! Build + install:
 //!
 //! ```text
-//! cargo build --manifest-path plugin-src/signups-stats/Cargo.toml \
-//!   --target wasm32-unknown-unknown --release
-//! wasm-tools component new \
-//!   target/wasm32-unknown-unknown/release/signups_stats.wasm -o signups-stats.wasm
-//! # drop into a project as plugins/signups-stats/signups-stats.wasm
+//! ledge plugin build --manifest-path plugin-src/signups-stats/Cargo.toml --project .
+//! # or, from the justfile: `just install-plugins`
 //! ```
 
-use ledge_plugin_sdk::bindings::ledge::plugin::host;
+use ledge_plugin_sdk::eds_html::escape;
+use ledge_plugin_sdk::host;
 use ledge_plugin_sdk::prelude::*;
-use ledge_plugin_sdk::serde_json;
-use serde::Deserialize;
 use std::collections::BTreeMap;
 
 /// The sheet data source a `signups-stats` block reads. Wrapping the path in a
@@ -44,7 +51,8 @@ impl SheetPath {
     /// Parse the block's `source` field into a sheet path, defaulting when absent.
     fn parse(fields: &Fields) -> Self {
         Self(
-            scalar(fields, "source")
+            fields
+                .str("source")
                 .map(str::to_owned)
                 .unwrap_or_else(|| Self::DEFAULT.to_owned()),
         )
@@ -55,24 +63,21 @@ impl SheetPath {
     }
 }
 
-/// The single-sheet EDS shape `host::read_sheet` returns: a `data` array of
-/// string-keyed cell objects (every EDS cell is a string).
-///
-/// This reads only the **single-tab** shape. A multi-tab sheet derives to the
-/// `:type:multi-sheet` envelope (no top-level `data`), so `data` defaults to
-/// empty and the block renders its empty state rather than erroring.
-#[derive(Deserialize)]
-struct Sheet {
-    #[serde(default)]
-    data: Vec<BTreeMap<String, String>>,
-}
-
-/// One signup row, parsed from a sheet `data` entry. Only the columns the stats
-/// view needs are pulled out; anything missing degrades gracefully (the row is
-/// still counted, just with empty display fields).
+/// One signup row, read from a sheet [`Row`]. Only the columns the stats view
+/// needs are pulled out; a row missing either column still counts toward the
+/// total, just with an empty display value for the missing one.
 struct Signup {
     submitted_at: String,
     name: String,
+}
+
+impl Signup {
+    fn from_row(row: &Row) -> Signup {
+        Signup {
+            submitted_at: row.get("submitted_at").unwrap_or_default().to_owned(),
+            name: row.get("name").unwrap_or_default().to_owned(),
+        }
+    }
 }
 
 /// The aggregate stats computed over the signup rows.
@@ -112,49 +117,36 @@ impl Stats {
     }
 }
 
-/// Render the `signups-stats` block: read the sheet fresh and render live stats.
-///
-/// Deliberately no `cache_get`/`cache_put` — see the module docs.
+/// Render the `signups-stats` block: read the sheet, memoize on a per-page,
+/// per-sheet-version key, and render live stats.
 #[ledge::renderer("signups-stats")]
-fn signups_stats(input: BlockInput) -> Result<Html, RenderError> {
-    let content = decode_block_content(&input.content)
-        .map_err(|e| RenderError::InvalidInput(e.to_string()))?;
-    let fields = single_fields(&content);
-    let source = SheetPath::parse(fields);
+fn signups_stats(block: Block) -> Result<Html, RenderError> {
+    let source = SheetPath::parse(block.fields());
+    let dep = SourceDep::Sheet(source.as_str().trim_start_matches('/').to_owned());
 
-    // Reading the sheet records it as a read-dependency, so the engine drops the
-    // published cache for this page when the sheet changes.
-    let Some(json) = host::read_sheet(source.as_str()) else {
-        return Ok(empty_state());
-    };
-
-    let rows = parse_signups(&json)?;
-    if rows.is_empty() {
-        return Ok(empty_state());
-    }
-
-    Ok(render_stats(&Stats::compute(rows)))
+    // Memoizing is safe now: the key carries the sheet's source-version, so a new
+    // signup changes the key and misses. (This block previously ran uncached
+    // BECAUSE a path-only KV key served stale counts after every submission.)
+    cache::memoize(&format!("signups-stats:{}", block.page_path()), &[dep], || {
+        Ok(render_stats(&Stats::compute(read_signups(&source))))
+    })
 }
 
-/// Parse the derived EDS sheet JSON into signup rows. The sheet is author-edited
-/// free text, so missing columns simply become empty display fields rather than
-/// dropping the row from the total.
-fn parse_signups(sheet_json: &str) -> Result<Vec<Signup>, RenderError> {
-    let sheet: Sheet = serde_json::from_str(sheet_json)
-        .map_err(|e| RenderError::Internal(format!("sheet is not valid JSON: {e}")))?;
-    let rows = sheet
-        .data
-        .into_iter()
-        .map(|mut row| Signup {
-            submitted_at: row.remove("submitted_at").unwrap_or_default(),
-            name: row.remove("name").unwrap_or_default(),
-        })
-        .collect();
-    Ok(rows)
+/// Read + parse the signup rows for `source`. An absent sheet reads as no rows,
+/// so the render degrades to the empty state rather than erroring.
+fn read_signups(source: &SheetPath) -> Vec<Signup> {
+    host::read_sheet(source.as_str())
+        .map(|sheet| sheet.rows().iter().map(Signup::from_row).collect())
+        .unwrap_or_default()
 }
 
 /// Render the stats panel: a prominent total, a latest line, and a per-day list.
+/// A zero total (an absent or empty sheet) renders the empty state instead.
 fn render_stats(stats: &Stats) -> Html {
+    if stats.total == 0 {
+        return empty_state();
+    }
+
     let mut html = String::from("<div class=\"signups-stats\">");
 
     html.push_str(&format!(
@@ -168,12 +160,12 @@ fn render_stats(stats: &Stats) -> Html {
         match day_of(&latest.submitted_at) {
             Some(day) => html.push_str(&format!(
                 "<p class=\"signups-stats-latest\">Latest: {} on {}</p>",
-                html_escape(who),
-                html_escape(day),
+                escape(who),
+                escape(day),
             )),
             None => html.push_str(&format!(
                 "<p class=\"signups-stats-latest\">Latest: {}</p>",
-                html_escape(who),
+                escape(who),
             )),
         }
     }
@@ -185,7 +177,7 @@ fn render_stats(stats: &Stats) -> Html {
             html.push_str(&format!(
                 "<li><span class=\"signups-stats-day\">{}</span>\
 <span class=\"signups-stats-count\">{}</span></li>",
-                html_escape(day),
+                escape(day),
                 count,
             ));
         }
@@ -217,43 +209,70 @@ fn display_name(name: &str) -> &str {
     }
 }
 
-/// The fields of a block, regardless of which `BlockContent` shape it uses. A
-/// `signups-stats` block is authored as `Single`, but reading from
-/// `Items`/`Container` too keeps the renderer robust.
-fn single_fields(content: &BlockContent) -> &Fields {
-    match content {
-        BlockContent::Single { fields } | BlockContent::Container { fields, .. } => fields,
-        BlockContent::Items { items } => items
-            .first()
-            .unwrap_or(EMPTY_FIELDS.get_or_init(Fields::new)),
-    }
-}
-
-/// A shared empty `Fields` for the no-items fallback, so [`single_fields`] can
-/// return a reference without allocating per call.
-static EMPTY_FIELDS: std::sync::OnceLock<Fields> = std::sync::OnceLock::new();
-
-/// Read a `Scalar` field as `&str`; `None` if absent or a non-scalar type.
-fn scalar<'a>(fields: &'a Fields, key: &str) -> Option<&'a str> {
-    match fields.get(key)? {
-        FieldValue::Scalar(s) => Some(s),
-        _ => None,
-    }
-}
-
-/// Escape `&`, `<`, `>`, and `"` for safe embedding in HTML text and attributes.
-fn html_escape(input: &str) -> String {
-    let mut out = String::with_capacity(input.len());
-    for ch in input.chars() {
-        match ch {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            other => out.push(other),
-        }
-    }
-    out
-}
-
 ledge_plugin_sdk::plugin!();
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ledge_plugin_sdk::mock::MockHost;
+
+    const TWO_SIGNUPS: &str = r#"{"total":2,"offset":0,"limit":2,":type":"sheet",
+        "data":[{"submitted_at":"2026-01-01T10:00:00Z","name":"Ada Lovelace"},
+                {"submitted_at":"2026-01-02T09:15:00Z","name":"Grace Hopper"}]}"#;
+    const ONE_SIGNUP: &str = r#"{"total":1,"offset":0,"limit":1,":type":"sheet",
+        "data":[{"submitted_at":"2026-01-01T10:00:00Z","name":"Ada Lovelace"}]}"#;
+
+    /// A `signups-stats` block authored with its default `source` (every test
+    /// here exercises the default; the field only needs to exist at all).
+    fn signups_block() -> Block {
+        Block::single("signups-stats", Fields::new())
+    }
+
+    #[test]
+    fn stats_cover_two_signups_on_different_days() {
+        let dep = SourceDep::Sheet("data/signups".into());
+        MockHost::new()
+            .sheet("/data/signups", TWO_SIGNUPS)
+            .source_version(&dep, 1)
+            .install(|| {
+                let html = signups_stats(signups_block()).unwrap();
+                assert!(html.contains("<span class=\"signups-stats-number\">2</span>"));
+                assert!(html.contains("Latest: Grace Hopper on 2026-01-02"));
+                // Both days show up in the per-day breakdown.
+                assert!(html.contains("2026-01-01"));
+                assert!(html.contains("2026-01-02"));
+            });
+    }
+
+    #[test]
+    fn an_absent_sheet_renders_the_empty_state_not_an_error() {
+        MockHost::new().install(|| {
+            let html = signups_stats(signups_block()).unwrap();
+            assert!(html.contains("No signups yet."));
+        });
+    }
+
+    #[test]
+    fn a_bumped_source_version_recomputes_instead_of_serving_a_stale_count() {
+        // THE regression this plugin exists to prove closed: a submission bumps
+        // the sheet's source-version, so the SAME memoize key would otherwise
+        // return the OLD count. One `MockHost` throughout, so the KV that took
+        // the first render's result is the KV the second render consults.
+        let dep = SourceDep::Sheet("data/signups".into());
+        let mock = MockHost::new()
+            .sheet("/data/signups", ONE_SIGNUP)
+            .source_version(&dep, 1);
+        let first = mock.install(|| signups_stats(signups_block()).unwrap());
+        assert!(first.contains("<span class=\"signups-stats-number\">1</span>"));
+
+        let mock = mock
+            .sheet("/data/signups", TWO_SIGNUPS)
+            .source_version(&dep, 2);
+        let second = mock.install(|| signups_stats(signups_block()).unwrap());
+        assert!(second.contains("<span class=\"signups-stats-number\">2</span>"));
+        assert_ne!(
+            first, second,
+            "a bumped source version must recompute, not serve the cached count"
+        );
+    }
+}

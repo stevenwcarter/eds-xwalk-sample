@@ -43,13 +43,15 @@ authoring-to-render loop:
   (a minijinja `sheet()` global); and
 - a **`signups-stats`** block — a **sandboxed WASM plugin** that reads the same
   sheet via the `read-sheet` host capability and renders a total, the latest
-  signup, and a per-day breakdown.
+  signup, and a per-day breakdown, **memoized** in the plugin's own KV cache.
 
 Submitting the form appends a row to the sheet; because Ledge invalidates the
 affected blocks on write, the table and stats blocks re-render with the new data
 on the next request. Everything is rendered **server-side** (the server is the
 only renderer), so the delivery port stays cache-friendly while reflecting live
-content.
+content. Reload `/signups` after submitting: the stats block's count updates
+too — its memoize key carries the sheet's source version, so a new signup is a
+new key, not a stale hit.
 
 ### Prerequisites
 
@@ -75,12 +77,16 @@ http://localhost:3002 (pass `just dev <port> <authoring-port>` to override).
 ### The plugin
 
 The plugin source lives in **`plugin-src/signups-stats/`** (a small Rust
-`cdylib` built against the Ledge plugin SDK). It is compiled to a WASM component
-and installed into the served `plugins/` tree by two timestamp-gated recipes:
+`cdylib` built against the Ledge plugin SDK). `just build-plugins` builds +
+installs it in one step via `ledge plugin build` (the `cargo build` +
+`wasm-tools component new` + copy-into-`plugins/` incantation, wrapped by the
+CLI), gated by the same timestamp check the recipe always used — `find -newer`
+against the installed `.wasm`, since `ledge plugin build` has no up-to-date
+check of its own:
 
 ```sh
-just build-plugins     # compile + componentize (only if sources changed)
-just install-plugins   # copy the built component into plugins/signups-stats/
+just build-plugins     # build + install via `ledge plugin build`, only if sources changed
+just install-plugins   # alias for build-plugins, kept for the `dev` recipe
 ```
 
 `just dev` runs `install-plugins` for you. `just clean` removes the build
