@@ -97,6 +97,22 @@ Modeling the content for blocks and sections must follow the best practices on h
 
 After making changes to the models in partial files (`_{blockname}` for example) run `npm run build:json` to regenerate the arragated files definitions, models and filters.
 
+**`component-definition.json`, `component-models.json` and `component-filters.json` are generated
+output — never edit them by hand.** `npm run build:json` overwrites them wholesale from the
+partials, so a hand-edit survives only until the next regeneration and then disappears silently,
+with lint still green. Everything must have a source partial:
+
+- A block's own definition, model and child filters go in `blocks/{blockname}/_{blockname}.json`.
+  This is true even for a block with no client-side JS or CSS (one rendered server-side by a ledge
+  plugin, for example) — it still needs the partial, or it will not exist in the Universal Editor.
+- **Registering a block so authors can insert it into a section** is a separate step: add its id to
+  the `section` filter's `components` list in `models/_section.json`. A block partial's own
+  `filters` entry declares that block's *children* (as `cards` does for `card`), not where the
+  block itself may be placed.
+
+After running `npm run build:json`, `git diff` should show only changes you intended; a diff that
+deletes entries means something was hand-added to a generated file without a partial behind it.
+
 Use `npm run lint` to verify the models follow the best practices. You can refer to https://github.com/adobe-rnd/eslint-plugin-xwalk?tab=readme-ov-file#rules for more details about the applied rules.
 
 Remember, building semantically appealing block, section and document models is key to  built websites with Edge Delivery Services in Adobe Experience Manager Sites as a Cloud Service using Universal Editor.

@@ -180,12 +180,224 @@
     ]
   },
   {
+    "id": "fieldsdemo",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "textField",
+        "value": "",
+        "label": "Text"
+      },
+      {
+        "component": "textarea",
+        "valueType": "string",
+        "name": "textareaField",
+        "value": "",
+        "label": "Textarea"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "richtextField",
+        "value": "",
+        "label": "Rich Text"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "numberField",
+        "label": "Number"
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "booleanField",
+        "label": "Boolean"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "selectField",
+        "label": "Select",
+        "options": [
+          {
+            "name": "Alpha",
+            "value": "alpha"
+          },
+          {
+            "name": "Beta",
+            "value": "beta"
+          },
+          {
+            "name": "Gamma",
+            "value": "gamma"
+          }
+        ]
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string[]",
+        "name": "multiselectField",
+        "label": "Multiselect",
+        "options": [
+          {
+            "name": "Red",
+            "value": "red"
+          },
+          {
+            "name": "Green",
+            "value": "green"
+          },
+          {
+            "name": "Blue",
+            "value": "blue"
+          }
+        ]
+      },
+      {
+        "component": "checkbox-group",
+        "valueType": "string[]",
+        "name": "checkboxGroupField",
+        "label": "Checkbox Group",
+        "options": [
+          {
+            "name": "North",
+            "value": "north"
+          },
+          {
+            "name": "South",
+            "value": "south"
+          },
+          {
+            "name": "East",
+            "value": "east"
+          }
+        ]
+      },
+      {
+        "component": "radio-group",
+        "valueType": "string",
+        "name": "radioGroupField",
+        "label": "Radio Group",
+        "options": [
+          {
+            "name": "Low",
+            "value": "low"
+          },
+          {
+            "name": "Medium",
+            "value": "medium"
+          },
+          {
+            "name": "High",
+            "value": "high"
+          }
+        ]
+      },
+      {
+        "component": "date-time",
+        "valueType": "date",
+        "name": "dateField",
+        "label": "Date"
+      },
+      {
+        "component": "date-time",
+        "valueType": "time",
+        "name": "timeField",
+        "label": "Time"
+      },
+      {
+        "component": "date-time",
+        "valueType": "date-time",
+        "name": "dateTimeField",
+        "label": "Date & Time"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "referenceField",
+        "label": "Image (reference)"
+      },
+      {
+        "component": "aem-content",
+        "name": "aemContentField",
+        "label": "Link (aem-content)"
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string[]",
+        "name": "aemTagField",
+        "label": "Tags (aem-tag)"
+      },
+      {
+        "component": "aem-content-fragment",
+        "valueType": "string",
+        "name": "contentFragmentField",
+        "label": "Content Fragment"
+      },
+      {
+        "component": "aem-experience-fragment",
+        "valueType": "string",
+        "name": "experienceFragmentField",
+        "label": "Experience Fragment"
+      }
+    ]
+  },
+  {
+    "id": "form",
+    "fields": [
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "form",
+        "label": "Form",
+        "options": []
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
         "component": "aem-content",
         "name": "reference",
         "label": "Reference"
+      }
+    ]
+  },
+  {
+    "id": "gallery",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "caption",
+        "value": "",
+        "label": "Caption"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "layout",
+        "label": "Layout",
+        "options": [
+          {
+            "name": "Grid",
+            "value": "grid"
+          },
+          {
+            "name": "Row",
+            "value": "row"
+          }
+        ]
       }
     ]
   },
@@ -242,177 +454,7 @@
     ]
   },
   {
-    "id": "fieldsdemo",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "textField",
-        "value": "",
-        "label": "Text"
-      },
-      {
-        "component": "textarea",
-        "valueType": "string",
-        "name": "textareaField",
-        "value": "",
-        "label": "Textarea"
-      },
-      {
-        "component": "richtext",
-        "valueType": "string",
-        "name": "richtextField",
-        "value": "",
-        "label": "Rich Text"
-      },
-      {
-        "component": "number",
-        "valueType": "number",
-        "name": "numberField",
-        "label": "Number"
-      },
-      {
-        "component": "boolean",
-        "valueType": "boolean",
-        "name": "booleanField",
-        "label": "Boolean"
-      },
-      {
-        "component": "select",
-        "valueType": "string",
-        "name": "selectField",
-        "label": "Select",
-        "options": [
-          { "name": "Alpha", "value": "alpha" },
-          { "name": "Beta", "value": "beta" },
-          { "name": "Gamma", "value": "gamma" }
-        ]
-      },
-      {
-        "component": "multiselect",
-        "valueType": "string[]",
-        "name": "multiselectField",
-        "label": "Multiselect",
-        "options": [
-          { "name": "Red", "value": "red" },
-          { "name": "Green", "value": "green" },
-          { "name": "Blue", "value": "blue" }
-        ]
-      },
-      {
-        "component": "checkbox-group",
-        "valueType": "string[]",
-        "name": "checkboxGroupField",
-        "label": "Checkbox Group",
-        "options": [
-          { "name": "North", "value": "north" },
-          { "name": "South", "value": "south" },
-          { "name": "East", "value": "east" }
-        ]
-      },
-      {
-        "component": "radio-group",
-        "valueType": "string",
-        "name": "radioGroupField",
-        "label": "Radio Group",
-        "options": [
-          { "name": "Low", "value": "low" },
-          { "name": "Medium", "value": "medium" },
-          { "name": "High", "value": "high" }
-        ]
-      },
-      {
-        "component": "date-time",
-        "valueType": "date",
-        "name": "dateField",
-        "label": "Date"
-      },
-      {
-        "component": "date-time",
-        "valueType": "time",
-        "name": "timeField",
-        "label": "Time"
-      },
-      {
-        "component": "date-time",
-        "valueType": "date-time",
-        "name": "dateTimeField",
-        "label": "Date & Time"
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "referenceField",
-        "label": "Image (reference)"
-      },
-      {
-        "component": "aem-content",
-        "name": "aemContentField",
-        "label": "Link (aem-content)"
-      },
-      {
-        "component": "aem-tag",
-        "valueType": "string[]",
-        "name": "aemTagField",
-        "label": "Tags (aem-tag)"
-      },
-      {
-        "component": "aem-content-fragment",
-        "valueType": "string",
-        "name": "contentFragmentField",
-        "label": "Content Fragment"
-      },
-      {
-        "component": "aem-experience-fragment",
-        "valueType": "string",
-        "name": "experienceFragmentField",
-        "label": "Experience Fragment"
-      }
-    ]
-  },
-  {
-    "id": "gallery",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "image",
-        "label": "Image",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "caption",
-        "value": "",
-        "label": "Caption"
-      },
-      {
-        "component": "select",
-        "valueType": "string",
-        "name": "layout",
-        "label": "Layout",
-        "options": [
-          { "name": "Grid", "value": "grid" },
-          { "name": "Row", "value": "row" }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "form",
-    "fields": [
-      {
-        "component": "select",
-        "valueType": "string",
-        "name": "form",
-        "label": "Form",
-        "options": []
-      }
-    ]
-  },
-  {
-    "id": "signups-table",
+    "id": "signups-stats",
     "fields": [
       {
         "component": "text",
@@ -424,7 +466,7 @@
     ]
   },
   {
-    "id": "signups-stats",
+    "id": "signups-table",
     "fields": [
       {
         "component": "text",
